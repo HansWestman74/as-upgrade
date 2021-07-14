@@ -1,0 +1,10 @@
+{
+  "extends": "assemblyscript/std/assembly.json",
+  "include": [
+    "./**/*.ts"
+  ],
+  "typedocOptions": {
+    "mode": "file",
+    "out": "docs"
+  }
+}
