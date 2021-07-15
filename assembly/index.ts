@@ -68,10 +68,18 @@ export function getNamedArgSize(name: String): Ref<u32> | null {
       return null;
     }
     error.revert();
-    return <Ref<u32>>unreachable();
+    unreachable();
   }
   const sizeU32 = changetype<u32>(size[0]);
   return new Ref<u32>(sizeU32);
+}
+
+function assertNonNull<T>(t: T, errorCode: ErrorCode): NonNullable<T> {
+  if (t == null) {
+    Error.fromErrorCode(errorCode).revert();
+    unreachable();
+  }
+  return <NonNullable<T>>t;
 }
 
 /**
@@ -86,11 +94,8 @@ export function getNamedArgSize(name: String): Ref<u32> | null {
  * given parameter is not present.
  */
 export function getNamedArg(name: String): Uint8Array {
-  let arg_size = getNamedArgSize(name);
-  if (arg_size == null) {
-    Error.fromErrorCode(ErrorCode.MissingArgument).revert();
-    return <Uint8Array>unreachable();
-  }
+  let arg_size = assertNonNull(getNamedArgSize(name), ErrorCode.MissingArgument);
+
 
   let nameBytes = encodeUTF8(name);
   let arg_size_u32 = changetype<u32>(arg_size.value);
@@ -99,7 +104,7 @@ export function getNamedArg(name: String): Uint8Array {
   const error = Error.fromResult(ret);
   if (error !== null) {
     error.revert();
-    return <Uint8Array>unreachable();
+    unreachable();
   }
   return data;
 }
@@ -120,7 +125,7 @@ export function readHostBuffer(count: u32): Uint8Array {
   const error = Error.fromResult(ret);
   if (error !== null) {
     error.revert();
-    return <Uint8Array>unreachable();
+    unreachable();
   }
   return result;
 }
@@ -137,7 +142,7 @@ export function getSystemContract(systemContract: SystemContract): Uint8Array {
   const error = Error.fromResult(ret);
   if (error !== null) {
     error.revert();
-    return <Uint8Array>unreachable();
+    unreachable();
   }
   return data;
 }
@@ -172,7 +177,7 @@ export function callContract(contractHash: Uint8Array, entryPointName: String, r
   const error = Error.fromResult(ret);
   if (error !== null) {
     error.revert();
-    return <Uint8Array>unreachable();
+    unreachable();
   }
   let hostBufSize = resultSize[0];
   if (hostBufSize > 0) {
@@ -228,7 +233,7 @@ export function getKey(name: String): Key | null {
       return null;
     }
     error.revert();
-    return <Key>unreachable();
+    unreachable();
   }
   let key = Key.fromBytes(keyBytes.slice(0, <i32>resultSize[0])); // total guess
   return key.unwrap();
@@ -284,13 +289,13 @@ export function getCaller(): AccountHash {
   const error = Error.fromResult(ret);
   if (error !== null) {
     error.revert();
-    return <AccountHash>unreachable();
+    unreachable();
   }
   const accountHashBytes = readHostBuffer(outputSize[0]);
   const accountHashResult = AccountHash.fromBytes(accountHashBytes);
   if (accountHashResult.hasError()) {
     Error.fromErrorCode(ErrorCode.Deserialize).revert();
-    return <AccountHash>unreachable();
+    unreachable();
   }
   return accountHashResult.value;
 }
@@ -354,7 +359,7 @@ export function listNamedKeys(): Array<Pair<String, Key>> {
   const error = Error.fromResult(res);
   if (error !== null) {
     error.revert();
-    return <Array<Pair<String, Key>>>unreachable();
+    unreachable();
   }
 
   if (totalKeys[0] == 0) {
@@ -369,7 +374,7 @@ export function listNamedKeys(): Array<Pair<String, Key>> {
 
   if (maybeMap.hasError()) {
     Error.fromErrorCode(ErrorCode.Deserialize).revert();
-    return <Array<Pair<String, Key>>>unreachable();
+    unreachable();
   }
   return maybeMap.value;
 }
@@ -561,7 +566,7 @@ export function addContractVersion(packageHash: Uint8Array, entryPoints: EntryPo
   const error = Error.fromResult(ret);
   if (error !== null) {
     error.revert();
-    return <AddContractVersionResult>unreachable();
+    unreachable();
   }
 
   const contractHash = keyBytes.slice(0, totalBytes[0]);
@@ -596,7 +601,7 @@ export function createContractUserGroup(packageHash: Uint8Array, label: String, 
   let err = Error.fromResult(ret);
   if (err !== null) {
     err.revert();
-    return <Array<URef>>unreachable();
+    unreachable();
   }
   let bytes = readHostBuffer(outputSize[0]);
   return fromBytesArray<URef>(bytes, fromBytesURef).unwrap();

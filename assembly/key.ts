@@ -157,7 +157,7 @@ export class Key {
 
     /** Serializes a `Key` into an array of bytes. */
     toBytes(): Array<u8> {
-        if(this.variant == KeyVariant.UREF_ID){
+        if(this.variant == KeyVariant.UREF_ID) {
             let bytes = new Array<u8>();
             bytes.push(<u8>this.variant)
             bytes = bytes.concat((<URef>this.uref).toBytes());
@@ -178,9 +178,8 @@ export class Key {
             bytes = bytes.concat((<AccountHash>this.account).toBytes());
             return bytes;
         }
-        else {
-            return <Array<u8>>unreachable();
-        }
+         unreachable();
+        return [];
     }
 
     /** Checks whether the `Key` is of [[KeyVariant]].UREF_ID. */
@@ -204,7 +203,7 @@ export class Key {
                 return null;
             }
             error.revert();
-            return <Uint8Array>unreachable();
+            unreachable();
         }
         // TODO: How can we have `read<T>` that would deserialize host bytes into T?
         return readHostBuffer(valueSize[0]);
