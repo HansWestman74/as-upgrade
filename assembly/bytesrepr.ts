@@ -92,7 +92,7 @@ export class Result<T> {
         if (errorCode != null) {
             const error = new StdError(errorCode.value);
             error.revert();
-            return <T>unreachable();
+            unreachable();
         }
         return this.value;
     }
